@@ -1,2 +1,4 @@
-# skailasa.github.io
-Stream of Consciousness
+# [skailasa.github.io](https://skailasa.github.io)
+
+Blog using the Jekyll framework.
+
