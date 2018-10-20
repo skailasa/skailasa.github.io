@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Reflections on a yaer in Startups"
+title: "Reflections on a year in Startups"
 date: 2018-10-20
 ---
 
