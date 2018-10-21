@@ -7,6 +7,7 @@ nav ul, footer ul {
     padding: 0px;
     list-style: none;
     font-weight: bold;
+    color: #ffc0cb;
 }
 nav ul li, footer ul li {
     display: inline;
@@ -27,6 +28,7 @@ p {
     font-size: 1.5em;
     line-height: 1.4em;
     color: #333;
+    font-family: 'Helvetica', 'Arial', 'Sans-Serif';
 }
 footer {
     border-top: 1px solid #d5d5d5;
