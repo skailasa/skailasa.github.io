@@ -13,7 +13,7 @@ from it.
 
 Fuck it, let's do a top 5.
 
-### 1) It's challenging, all the time, and for different reasons
+## 1) It's challenging, all the time, and for different reasons
 Startups, especially the good ones, will try their best to promote learning and teaching.
 This is especially the case if they've hired a lot of junior staff, but to be honest
 there's simply not enough time. Shit has to get done, there isn't enough time to really
@@ -23,21 +23,21 @@ If you've gone there to learn, you're in for a hell of a curve. I felt like I wa
 how to ship and deploy a product, at the same time as still figuring out how to write half
 decent code.
 
-### 2) You'll become good buddies with your colleagues
+## 2) You'll become good buddies with your colleagues
 I've spent countless hours at my desk next to the same 2-3 people. The proximity, and often
 the stress, will basically forge you and your colleagues together. Sounds like a cliche one, 
 but to be fair, so is (1), but it's true. Prepare to make some friends.
 
-### 3) You need to figure out your motivation
+## 3) You need to figure out your motivation
 No-one is there to motivate you, you have to figure out what you are going for and really go
 for it. If you want to take charge of something, and push something into production, it
 can happen. 
 
-### 4) You need to know when to move on
+## 4) You need to know when to move on
 If you're not learning, your're not moving forward. Just like in coding, if you're not failing
 fast you're not growing fast enough.
 
-### 5) Everyone is figuring something out for the first time
+## 5) Everyone is figuring something out for the first time
 This was a strange realisation to have. 
 
 Overall, I'm glad I've had the experience, but I'm not sure if I would do it again. I can't
@@ -59,7 +59,7 @@ computing. I was excited to learn, and I certainly hadn't felt like that for lar
 degree. This is a point I wanted to emphasise with (4), if you're not growing and learning you
 should think about your position.
 
-### Bonus) Is this a bubble??
+## Bonus) Is this a bubble??
 Having spent the year attending meetups, talking to other devs, browsing HN, and watching
 the seemingly endless stream of new Data/ML startups set to "disrupt" everything from banking
 to my lunch it's starting to feel like a false economy. Few companies are turning a profit,
