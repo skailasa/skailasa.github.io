@@ -17,7 +17,7 @@ This is much easier to understand than it sounds from that scary sentence nicked
 
 | `A` | `B` | `A & B` |
 | :---: | :---: | :---: | 
-| 0 | 0 | 1 |
+| 0 | 0 | 0 |
 | 1 | 0 | 0 |
 | 0 | 1 | 0 |
 | 1 | 1 | 1 |
