@@ -361,7 +361,7 @@ class Graph:
 
 
 g = Graph()  # create graph object
-g['a'] = ['b', 'c', 'd']  # add nodes
+g['a'] = 'b' # add nodes
 ```
 
 If you're interested in how graphs are implemented check out [CLRS](https://en.wikipedia.org/wiki/Introduction_to_Algorithms)
