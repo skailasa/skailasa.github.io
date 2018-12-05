@@ -61,7 +61,7 @@ def smallest(l):
         i += 1
 
         if i == len(l):
-            return idx_smallest, smallest
+            found = True 
 
     return idx_smallest, smallest
 
