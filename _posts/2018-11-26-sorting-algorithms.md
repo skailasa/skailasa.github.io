@@ -72,10 +72,10 @@ def selection_sort(l):
         that at the appropriate index.
     """
 
-    sorted = False
+    ordered = False
     i = 0
 
-    while not sorted:
+    while not ordered:
 
         idx_smallest, val_smallest = smallest(l[i:])
         if val_smallest <= l[i]:
@@ -84,18 +84,18 @@ def selection_sort(l):
         i += 1
 
         if i == len(l):
-            sorted = True
+            ordered = True
 
     return l
 ```
 
 ### Analysis
 
-As a minimum this algorithm will operate in O(N^2) in the worst and 
+As a minimum this algorithm will operate in $O(N^2)$ in the worst and 
 average case. We can see this as being due to the need to iterate through
-the whole list (N-i) times at the ith timestep in the sort in order to
-find the next smallest element. Giving a leading order complexity of O(N^2)
-We can perform the entire sort in-place so we only take up O(1) memory.
+the whole list $(N-i)$ times at the $i^{th}$ timestep in the sort in order to
+find the next smallest element. Giving a leading order complexity of $O(N^2)$
+We can perform the entire sort in-place so we only take up $O(1)$ memory.
 
 ## Merge Sort
 
@@ -105,22 +105,22 @@ your problem into approachable sub-problems, solving these, and combining'
 the sub-problem solutions together into a final solution.
 
 Merge sort closely follows this paradigm. Intuitively, it operates by
-dividing an n-element list into two subsequences of n/2 elements each,
+dividing an $n$ element list into two subsequences of $\frac{n}{2}$ elements each,
 sorting the subsequences, and finally merging the results. The recursion
 has a base case of when you have a list of only a single element which is
 already sorted.
 
 Our major motivation here is to save on time-complexity, and the recursive
 division of our problem space gives us a clue to it being significantly
-less than O(N^2) like for selection sort. However, an implementation
+less than $O(N^2)$ like for selection sort. However, an implementation
 example should clarify this.
 
 To understand the merge operation a didactic example is sorting a deck
 of cards. Imagine two piles of cards, picking one up off one pile and
 one off the the other pile, comparing the two values and placing face
-down in a third pile. We do this until one of the first two piles are
-empty, at which point we place the remaining cards from the non-empty
-pile down on the third pile.
+down in a third pile the smallest card. We do this until one of the first
+two piles are empty, at which point we place the remaining cards from the
+non-empty pile down on the third pile.
 
 We can sort by dividing the array to be sorted into two, and recursively
 calling sort on the two portions, finally merging the results.
@@ -175,20 +175,20 @@ What kind of complexity can we expect with this algorithm? Well, to get
 an idea we can estimate the number of elements in the recursion tree. This
 will give us an indication of the number of operations taking place, and
 therefore a time complexity. Inductively, we can infer that there are
-log(N) + 1 levels in the recursion tree. For example, a list of length 1
-would have log(1) + 1 = 0 levels, as we only call the `sort` function
-once. Furthermore, the complexity of the merge operation is O(N) as we
+$\log(N) + 1$ levels in the recursion tree. For example, a list of length 1
+would have $\log(1) + 1 = 0$ levels, as we only call the `merge_sort` function
+once. Furthermore, the complexity of the merge operation is $O(N)$ as we
 may have to iterate through the whole list in order to merge. So total
-complexity can be seen to be O(N(log(N) + 1)) = O(Nlog(N)). Space
-complexity is O(N) due to the need to store the result of the merge
+complexity can be seen to be $O(N(\log(N) + 1)) = O(N\log(N))$. Space
+complexity is $O(N)$ due to the need to store the result of the merge
 operation.
 
 ## Quick Sort
 
 Merge sort has a wasteful bit of memory usage in that we need to keep a
 record of the merged results at each step. Quick sort lets us avoid this
-by sorting in place. It's worst case runtime is O(N^2), however it has
-an average case runtime of O(NlogN) - same as merge sort, and the worst
+by sorting in place. It's worst case runtime is $O(N^2)$, however it has
+an average case runtime of $O(N\log(N))$ - same as merge sort, and the worst
 case can be avoided by a clever strategy on behalf of the programmer,
 however this will be much easier to explain in code, so let's start with
 the implementation.
@@ -237,11 +237,11 @@ def partition(l, low, high):
 ```
 
 I like to think of this as moving a dividing line up the array from left
-to right (essentially the `i` index above), and checking if everything to
+to right (essentially the $i$ index above), and checking if everything to
 the left of this line is smaller than the pivot element, which we've chosen
-to be the last element of the array. Once the for loop has completed `i`
+to be the last element of the array. Once the for loop has completed $i$
 will equal the number of swaps, hence elements, that are smaller than the
-pivot - therfore will tell us where to place the pivot element, which
+pivot - therefore will tell us where to place the pivot element, which
 happens in the last line. Furthermore, this all happens in place on the array,
 we just return the index of the pivot element.
 
@@ -271,7 +271,7 @@ we should be a little more careful in our analysis.
 Starting with the partitioning, in the worst case. This occurs when we
 the procedure produces a sub-problem to two with n elements and 0 elements
 respectively for every partition i.e. our array is anti-sorted `[5, 4, 3, 2, 1]` 
-Then the partitioning will be of O(N^2). Therefore in the worst case
+Then the partitioning will be of $O(N^2)$. Therefore in the worst case
 quick sort is as rubbish as insertion sort. However, this can be helped
 with clever choices of pivot - for example just picking a random pivot
 each time, or something that reflects the data you are actually trying to
@@ -280,13 +280,13 @@ sort just so that you aren't faced with this problem.
 In the best case, we'd get two partitioned sub-problems of equal size.
 This is now of the same order of complexity as merge sort, as something
 approximately the same is happening, just differently! This results in a
-quick sort complexity of O(NlogN).
+quick sort complexity of $O(N\log(N))$.
 
 In fact, as detailed in [CLRS](https://en.wikipedia.org/wiki/Introduction_to_Algorithms)
 sub-problems have to be extremely unbalanced to not achieve something
 approaching the best case performance, i.e. even if we get two sub-problems
-of size 9N/10 and N/10 we'd still get O(NlogN) performance, however this
-is definitely something to detail in another post. For now I hope you're
+of size $\frac{9N}{10}$ and $\frac{N}{10}$ we'd still get $O(N\log(N))$ performance,
+however this is definitely something to detail in another post. For now I hope you're
 happy to use this as a fact.
 
 ## Binary Search
@@ -319,10 +319,10 @@ def binary_search(l, element):
 
 We are cutting our problem space in two every time as we head down the
 recursion tree. Therefore, the number of operations till we find our
-element is the sum of N + N/2 + N/4 + ... + 1, where for N elements we do
-2^k operations, where k is the step. Hence we'd have the relationship 2^k = N 
+element is the sum of $N + N/2 + N/4 + ... + 1$, where for $N$ elements we do
+$2^k$ operations, where k is the step. Hence we'd have the relationship $2^k = N$ 
 between the number of elements in our array and the number of steps, so
-the runtime is O(log(N)).
+the runtime is $O(\log(N))$.
 
 A good take away from this is that if your problem space is reducing in
 size with each step it's complexity is likely to be log-ish.
@@ -403,7 +403,7 @@ def dfs(root, graph, visited=None):
 ### Analysis
 
 Depth-first search visits every vertex once and checks every edge in the
-graph once. Therefore, DFS complexity is O(V+E) This assumes that the graph
+graph once. Therefore, DFS complexity is $O(V+E)$ This assumes that the graph
 is represented as an adjacency list.
 
 ## Breadth First Search
