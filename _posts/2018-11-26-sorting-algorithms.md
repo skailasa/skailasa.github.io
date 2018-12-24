@@ -364,7 +364,7 @@ g = Graph()  # create graph object
 g['a'] = 'b' # add nodes
 ```
 
-If you're interested in how graphs are implemented check out [CLRS](https://en.wikipedia.org/wiki/Introduction_to_Algorithms)
+If you're interested in how graphs are implemented check out [CLRS](``https://en.wikipedia.org/wiki/Introduction_to_Algorithms)
 , I can't sell this book enough. Here I've chosen to represent it with a
 adjacency list, using Python's default dict object, which basically allows
 one to have a dict with keys which are lists. Here the keys represent nodes
