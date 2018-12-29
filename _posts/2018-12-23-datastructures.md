@@ -9,7 +9,7 @@ there are also atomic data strutures. These essentially amount to different
 objects to store data in, each object following a conveniently designed
 protocol. In this post I'm going to go through the most common ones that
 every coder should just sort of know. Namely: **linked lists**, **hash tables**,
-**stacks**, **queues** and **rooted trees**.
+**stacks**, **queues** and **r rooted trees**.
 
 This may sound like a lot for a single post, but as we'll see, a lot of 
 the protocols kind of boil do to a single use case - storing data, and 
@@ -45,7 +45,6 @@ usually doens't accept any arguments as Stacks by their nature follow LIFO.
 
 ```python
 class Stack:
-
     def __init__(self):
         """Implement using a list"""
         self._stack = []
@@ -92,7 +91,6 @@ operations are called dequeue and enqueue by convention for queues.
 
 ```python
 class Queue:
-
     def __init__(self):
         """Implement using a list"""
         self._queue = []
@@ -153,8 +151,10 @@ data.
 
 ```python
 class Node:
-    """Node to store data, and pointer to next node in linked list
-        as well as a pointer to the previous node."""
+    """
+    Node to store data, and pointer to next node in linked list
+        as well as a pointer to the previous node.
+    """
     def __init__(self, data):
         self._next = None
         self.prev = None
@@ -163,7 +163,6 @@ class Node:
 
 class LinkedList:
     """Implement using Nodes and Pointers"""
-
     def __init__(self):
         self.head = Node(None)
 
@@ -242,30 +241,200 @@ nodes, which will inevitable vary with the type of rooted tree.
 The nodes of binary trees can only point at most to two other nodes,
 hence **binary**. We refer to nodes, and the ones they point to as 
 'parents' and 'children', respectively,
-
-### Binary Search Trees
-
-Binary search trees have the additional property that all child nodes to
-the left of a given node contain data in of smaller or equal value to the
-datum in that node, and all nodes to it's right contain data of greater
-value.
-
+In terms of implementation, it's a fairly common pattern I've seen
+[elsewhere](http://cslibrary.stanford.edu/110/BinaryTrees.html) to specify
+binary (search) trees in an abstract manner. Using just a `Node`
+object, with pointers to a given node's parent, and two children. 
 
 ```python
 class Node:
-    def __init(self, data):
+    """Implement a tree by specifying relations between nodes."""
+    def __init__(self, data):
         self.parent = None
         self.left_child = None
         self.right_child = None
         self.data = data
 ```
 
-I've only bothered implementing the `Node` object, and only partially out
-of laziness. Firstly it's unlikely that you'll ever have to implement a
-full binary in
+In terms of manipulating this structure to view/insert/delete data we
+can implement common tree-traversal methods. Below, I've implemented a
+`lookup` method to find a given node in binary (search) tree using in-order
+traversal:
+
+```python
+def lookup(node, value):
+    """
+    Lookup a given value in a binary tree, starting the search at
+        a specified root node. Returns True if value is contained,
+        within tree, False otherwise.
+    """
+    if node:
+        if (
+            node.data == value
+            or lookup(node.left_child, value)
+            or lookup(node.right_child, value)
+        ):
+            return True
+
+    return False
+```
+
+### Binary Search Trees
+
+Binary search trees have the additional property that all child nodes to
+the left of a given node contain data in of smaller or equal value to the
+datum in that node, and all nodes to it's right contain data of greater
+value. For integers this is obvious, but less so for things like strings.
+Where you may have to map the data you're storing back to unique integers
+in order to store it. Using this we can write a simple method to insert
+data into Binary Search Trees.
+
+```python
+# construct a simple BST with empty leaf nodes
+n2 = Node(2)
+n1 = Node(1)
+n3 = Node(3)
+
+n2.left_child = n1
+n2.right_child = n3
+n1.parent = n2
+n3.parent = n2
+
+n3.left_child = Node(None)
+n3.right_child = Node(None)
+n3.left_child.parent = n3
+n3.right_child.parent = n3
+
+n1.right_child = Node(None)
+n1.left_child = Node(None)
+n1.left_child.parent = n1
+n1.right_child.parent = n1
+
+ 
+def insert(node, value, pointer=None):
+    """
+    Insert data into Binary Search Trees
+        Begin by looking up whether or not a node exists with this value
+        in the tree. If it does not, we have to recurse down the tree to
+        find an appropriate place to store the value.
+    """
+    if node and node.data:
+        if value <= node.data:
+            pointer = node.left_child
+            insert(node.left_child, value, pointer)
+        else:
+            pointer = node.right_child
+            insert(node.right_child, value, pointer)
+
+    else:
+        pointer.data = value
+```
+
+I've used a similar recursive strategy to implement `insert` and `lookup`
+above. This is because recursion pops out fairly naturally when manipulating
+trees, mostly beacuse we'll want to consider each node of a tree in a
+linear manner, often based on a condition, but the data structure is 
+itself clearly non-linear.
+
+Python doesn't offer any tree primitives, so are they really that useful?
+I think a lot people understimate the importance of trees. Famously the
+author of [Homebrew](https://twitter.com/mxcl/status/608682016205344768)
+complained about being rejected from Google for 'failing to invert a 
+binary tree', which he thought was BS as he had created software that 
+pretty much all Mac coders use. Initially I was inclined to side with him,
+but I read this 
+[blog post](https://thecodebarbarian.com/i-dont-want-to-hire-you-if-you-cant-reverse-a-binary-tree) 
+that really changed my mind on the issue.
+
+So why doesn't Python implement tree primitives despite them being so
+important in Computer Science? The truth is it does, a more complex abstraction
+such as a Python dictionary, or a JSON object is built on top of a tree like
+structure. In terms of raw trees, much like my implementation of a linked
+list earlier, Python's creators probably thought it was more useful in 
+terms of solving problems to wrap the basic abstraction inside a higher
+level concept, which when you think about it is. Do you really want to
+implement a tree traversal method, every time you want to look up an item
+in a `dict` like structure?
+
+### Analysis
+
+My recursive tree methods above go through each node, one by one,
+operating on a constructed tree in-place. Therefore, they are of $O(1)$
+in space, and of $O(log(N))$ in time. This comes from the number of levels
+in a binary tree, which can be found by using a similar argument to that
+of [merge sort](2018/12/05/sorting-algorithms.html). But as a binary tree
+could degenerate into a linked-list, this time complexity in the worst
+case would be $O(N)$. 
 
 ## Hash Tables
 
+Hash tables are the most effective way of representing an abstratction
+for `dictionary` like objects. i.e. where we want to read, update, and
+insert data by reference to some name. In theory names (or hashes) are
+difficult to create uniquely (search for hash collisions), but in practice
+most hashing algorithms are sound enough to make collisions very rare indeed.
+This lookup can be very efficient, $O(1)$, as long as we can guarantee
+unique hashes.
 
+I've built a fairly contrived implementation below, using Python lists
+as the underlying data structure. I've used lists to handle potential
+hash collision, i.e. if a hash for a particular value corresponds to
+a hash for some other value, by using a list to store values you can
+handle collisions.
 
+```python
+def small_hash(value):
+    return hash(value) % 100
 
+class HashTable:
+    """Simple Hashtable implementation using Python lists"""
+
+    def __init__(self):
+        # buffer space
+        self._table = [None for i in range(int(10e5))]
+        self._values = []
+
+    def __repr__(self):
+
+        l = []
+        for v in self._values:
+            l.append((v, self._table[small_hash(v)]))
+
+        return str(l)
+
+    def __setitem__(self, value, item):
+        key = small_hash(value)
+
+        if value not in self._values:
+            self._values.append(value)
+
+        if not self._table[key]:
+            self._table[key] = [] 
+
+        self._table[key].add(item)
+
+    def __getitem__(self, value):
+        key = small_hash(value)
+
+        return self._table[key]
+```
+
+In reality you would never bother implementing the above code in Python
+as dictionaries are primitives in the language, and in many other languages
+both interpreted and compiled.
+
+### Analysis
+
+If you're hashing algorithm is decent, you should be able to perform
+lookups/inserts in $O(1)$ on average. 
+
+## Conclusion
+
+Data structures are a very deep topic, and I've scratched the surface
+here with simple implementations, of fairly simple data structures. For
+example, the hash table I've implemented is one in which I've not optimised
+the hash function to reduce collisions, or considered really the type of
+problem I'd wish to solve (and hence the underlying data structure it
+should rely on). However, it's a good start for anyone interesting in
+studying the topic, and CLRS is really the place to supplemement this
+post.
