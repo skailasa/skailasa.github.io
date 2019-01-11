@@ -4,7 +4,7 @@ title: "Data Structures for Humans"
 date: 2018-12-23
 ---
 
- Just as there are atomic [algorithms](2018/12/05/sorting-algorithms.html)
+Just as there are atomic [algorithms](2018/12/05/sorting-algorithms.html)
 there are also atomic data strutures. These essentially amount to different
 objects to store data in, each object following a conveniently designed
 protocol. In this post I'm going to go through the most common ones that
