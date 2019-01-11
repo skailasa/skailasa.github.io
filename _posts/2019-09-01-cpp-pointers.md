@@ -263,7 +263,7 @@ using namespace std;
 
 void func()
 {
-    puts("This is the func()")'
+    puts("This is the func()");
 }
 
 int main()
