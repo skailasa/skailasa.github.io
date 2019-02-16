@@ -50,7 +50,7 @@ Think of no border controls, and universal basic income. 3/5.
 Not usually one to watch zombie films, but really hilarious and original
 take on a classic genre, begins with a 37 single take, with minor details
 turning out to be the basis of hilarious scenes well into the film. 4/5.
-- [[cheney/mckay/2018]](https://en.wikipedia.org/wiki/Vice_(2018_film)) - 
+- [[vice/mckay/2018]](https://en.wikipedia.org/wiki/Vice_(2018_film)) - 
 Biopic of someone I personally knew very little about, Dick Cheney, VP during
 the Bush administration. Interesting, and from the same guy who did the Big
 Short. Though provoking but almost certainly simplifying, it was pretty
