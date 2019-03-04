@@ -44,6 +44,16 @@ and systemic change. 5/5.
 - [[utopia for realists/bregman/2017/new-thinking]](https://www.amazon.co.uk/Utopia-Realists-How-Can-There/dp/1408890267) -
 Short and insightful book about some interesting ideas that might be necessary.
 Think of no border controls, and universal basic income. 3/5.
+- [[down and out in paris & london/orwell/1933/biography]](htttps://www.amazon.co.uk/Paris-London-Penguin-Modern-Classics/dp/0141393033) -
+Semi-biographical book about Orwell's experience amongst the working
+classes of two great cities, whilst he was struggling to establish himself
+as a writer. Reads a bit like a travelogue, which is imho a bit distasteful,
+but very compassionate and real, and best of all short. 3/5.
+- [[this changes everything/klein/2013/environment]](https://www.amazon.co.uk/This-Changes-Everything-Capitalism-Climate/dp/0241956188/ref=sr_1_1?s=books&ie=UTF8&qid=1551691309&sr=1-1&keywords=this+changes+everything+naomi+klein) -
+This book shook me, I have spent years like everyone else quietly accepting
+climate disaster as inevitable. Klein pointed out to me that this idea is
+both dangerous and wrong. Full of genuine insight, even if it is a little dated
+now rendering some of the analysis wrong, or too optimistic. 5/5.
 
 ## Films [name/director/year]
 - [[one cut of the dead/ueda/2017]](https://en.wikipedia.org/wiki/One_Cut_of_the_Dead) -
