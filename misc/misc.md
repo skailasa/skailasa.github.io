@@ -65,3 +65,15 @@ Biopic of someone I personally knew very little about, Dick Cheney, VP during
 the Bush administration. Interesting, and from the same guy who did the Big
 Short. Though provoking but almost certainly simplifying, it was pretty
 entertaining though. 3/5.
+- [[us/peel/2019]](https://en.wikipedia.org/wiki/Us_(2019_film)) - 
+After 'Get Out' last year I was really looking forward to this film, but it turned
+out to be fairly mediocre - from being a genuine foreboding horror to a standard
+thriller towards the end. Obviously films are allowed to have some license over the
+strange cinematic logic that they follow, but the plot holes in this felt like they
+went too far without really serving any purpose other than to make it look like a
+bad film. 2/5.
+- [[goodefellas/scorsesee/1990]](https://en.wikipedia.org/wiki/Goodfellas) - 
+I'd heard of references to this film for ages, so went to see it at the Prince Charles
+when they were doing a screening. I can definitely see why its a lot manly men's favourite
+film, Wolf of Wallstreet vibes - which also makes sense as it's the same director.
+It was OK, nothing special, quite funny at times though. 3/5.
