@@ -22,7 +22,8 @@ great stuff.
 software engineering, goes through loads of concepts in some great blog posts. I 
 found this blog by looking for info on 
 [microservices](https://martinfowler.com/articles/microservices.html).
-
+- [[alex-dursi/computational-science]](https://www.dursi.ca/) - A veteran research
+software developer, lots of interesting insights into HPC/Research Development.
 
 ## Books [title/year/author/topic]
 
