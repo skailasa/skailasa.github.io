@@ -25,8 +25,10 @@ Then just copy this into your `_includes` folde on your blog in a new html file.
 you've done this you can add the following liquid tab to your default layouts. Where I've
 called it `analytics.html`.
 
-```html
+```h
+{% raw  %}
 {% include google_analytics.html %}
+{% endraw %}
 ```
 
 Google should start picking up analytics within a few hours.
