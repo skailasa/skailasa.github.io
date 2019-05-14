@@ -78,3 +78,13 @@ I'd heard of references to this film for ages, so went to see it at the Prince C
 when they were doing a screening. I can definitely see why its a lot manly men's favourite
 film, Wolf of Wallstreet vibes - which also makes sense as it's the same director.
 It was OK, nothing special, quite funny at times though. 3/5.
+- [[eigth grade/burnham/2018]](https://en.wikipedia.org/wiki/Eighth_Grade_(film)) -
+From Bo Burnham, managed to capture being a yound teenager with all it's anxiety
+with incredible accuracy. The score was really good, and the whole thing was
+handled with a great deal of empathy. Fantastic, 5/5.
+- [[detective pikachu/letterman/2019]](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Detective_Pikachu) - 
+Basically just a way to see Pokemon on screen, pretty fun, and the Pikachu was pretty cute.
+3/5.
+- [[avengers: endgame/russo/2019]](https://en.wikipedia.org/wiki/Avengers:_Endgame) -
+Pretty much as expected, way too long, and too many characters to really understand what
+was going on without a degree in Marvel or something. 2/5.
