@@ -10,14 +10,14 @@ In order to do this, I'm going to draw on the sole other experience I've had of 
 
 I'm going to have to take a similar approach to preparing for these interviews. In terms of CS, I'm pretty bare bones in terms of computer architecture, and how things like compilers and networks work. I don't fully understand how floating point operations are carried out on real hardware, and how different parts of a computer come together to form a coherent structure, that can do stuff! I know of many algorithms and most common datastructures, but I'm not hugely comfortable whiteboarding. So, despite the various online guides for 'how to prepare for interview X', I'm going to sort of ignore them and prepare a list of topics for myself. There are 3 big questions I want to spend the next year or so, before I interview for full time roles, that I want to be in a position to answer.
 
-#### 1) How are algorithms translated into electrical signals, and back?
+## 1) How are algorithms translated into electrical signals, and back?
 
 This will cover topics in computer architecture, compiler theory, as well as how algorithms are processed by hardware. I think this is probably the biggest gap in my knowledge, and though it isn't stricly neccessary by most people's accounts of sitting these interviews. I personally think that a solid understanding of these topics will make everything else much easier to digest.
 
-#### 2) How does the internet work?
+## 2) How does the internet work?
 
 This will cover the basics of networking protocols, and how communication happens on both a hardware and network level. I have a vague notion of this just from software development experience, but not understanding this is a big blocker for me. It will make understanding cloud technologies, as well as how things within unix (which is organised in terms of network communication) mean.
 
-#### 3) How do you break down an unfamiliar problem into a solution?
+## 3) How do you break down an unfamiliar problem into a solution?
 
 Whiteboarding is unfortunately compulsory, but the only reason people fear it is because of their lack of knowledge. Answering this question will force me to understand all the basic algorithms and datastructures like the back of my hand, and be able to deploy them at will. This is much more useful than mindlessly chugging away at Leetcode - though that will be a part of it.
