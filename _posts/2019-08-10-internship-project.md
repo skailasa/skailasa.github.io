@@ -48,7 +48,7 @@ from traits.api import (
 )
 
 
-class Professor(HasTraits)e
+class Professor(HasTraits):
     supervisee = Instance(Student)
     name = Str("A Professor")	
     faculty = Str('Mathematics') 	
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     student = Student()
     professor = Professor(student=student)
     student.age = 26
-    print(professor.student.age)  # 26
+    print(professor.student.age)  # 25
 ```
 
 This simple decorator allows you to listen to changes in attributes of another object.
