@@ -5,7 +5,7 @@ date: 2020-02-20
 ---
 
 A storm is raging outside in London, and the world is on the brink of 
-a Coronavirus pandemic, but have you always wanted to know just what a Y
+a Coronavirus pandemic, but you have always wanted to know just what a Y
 Combinator was didn't you? The phrase has been popularised by the startup
 school of the same name, and there's actually some very interesting mathematics
 behind it.
@@ -45,7 +45,7 @@ in the sense that it's not making reference to an 'x' defined elsewhere in your
 lambda expression, (or your code if you were programming).
 
 
-## 2) Reduction in the Lambda Calculus
+## 3) Reduction in the Lambda Calculus
 
 Just like in other forms of calculus (in my definition, justmethods of calculating things) we need
 some way of simplfying expressions we write down. The lambda calculus defines 3 basic ways of doing this, and they are called 'reduction' methods.
@@ -118,7 +118,7 @@ $$
 \text{FAC} = (\lambda \text{fac}. \>  (\lambda n. \> (...\text{fac}...))) \text{FAC}
 $$
 
-which you can verify. Why does this help, this loooks worse! However, we can
+which you can verify. Why does this help, this looks worse! However, we can
 now see that the above expression is of the form,
 
 $$
