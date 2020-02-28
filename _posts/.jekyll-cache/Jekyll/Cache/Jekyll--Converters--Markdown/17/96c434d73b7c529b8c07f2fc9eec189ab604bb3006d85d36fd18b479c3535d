@@ -1,0 +1,24 @@
+I"�<p>A storm is raging outside in London, and the world is on the brink of 
+a Coronavirus pandemic, but have you always wanted to know just what a Y
+Combinator was didn’t you? The phrase has been popularised by the startup
+school of the same name, and there’s actually some very interesting mathematics
+behind it.</p>
+
+<h1 id="1-what-is-it-for">1) What is it for?</h1>
+
+<p>It helps to define recursive functions in the lambda calculus.
+Let’s break that down. Recursion is the cornerstone of control flow in the
+functional style of programming. However, it’s not possible to define recursive
+functions in the lambda calculus. The lambda calculus is just a set of simple
+rules that underpin functional programming, that allows one to express 
+arbitrary computations in terms of the application of functions to inputs to
+receive outputs, it’s so simple that it doesn’t make space for recursive
+functions.</p>
+
+<p>A lambda abstraction allows me to express an anonymous function in the lambda
+calculus, and will be very familiar with Python programmers who’ve used Python’s
+anonymous functions.</p>
+
+<script type="math/tex; mode=display">\lambda x . (+ 1 ) x \text{or} \lambda x . x + 1</script>
+
+:ET

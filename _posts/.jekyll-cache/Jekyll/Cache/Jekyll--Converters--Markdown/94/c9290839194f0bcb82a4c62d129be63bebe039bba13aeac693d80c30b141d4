@@ -1,0 +1,426 @@
+I"��<p>Just as there are atomic <a href="2018/12/05/sorting-algorithms.html">algorithms</a>
+there are also atomic data strutures. These essentially amount to different
+objects to store data in, each object following a conveniently designed
+protocol. In this post I’m going to go through the most common ones that
+every coder should just sort of know. Namely: <strong>linked lists</strong>, <strong>hash tables</strong>,
+<strong>stacks</strong>, <strong>queues</strong> and <strong>r rooted trees</strong>.</p>
+
+<p>This may sound like a lot for a single post, but as we’ll see, a lot of 
+the protocols kind of boil do to a single use case - storing data, and 
+accessing it conveniently in order to <em>implement</em> different algorithms. 
+Implementation of algorithms is key here, the design of data structures 
+is intrinsically interesting from a maths perspective, but their design is
+heavily influenced by the problems you can solve by using them.</p>
+
+<p>Similar to the previous post on <a href="2018/12/05/sorting-algorithms.html">algorithms</a>
+I’m going to go through the above data structures one by one, and write a
+simple Python implementation of the protocol. Furthermore, as a Python
+programmer I’m also going to write a little bit about how Python implements 
+these data structures as language <em>primitives</em> (i.e. for free!) as it 
+doesn’t necessarily strictly adhere to the above protocols as described 
+in CS <a href="https://en.wikipedia.org/wiki/Introduction_to_Algorithms">textbooks</a>
+but they do offer some convenient extras that are special to the language.
+My aim here is simply to make visible all the moving parts.</p>
+
+<h2 id="stacks-and-queues">Stacks and Queues</h2>
+
+<h3 id="stacks">Stacks</h3>
+
+<p>Stacks and queues are well named, and would behave as you would expect
+for such objects. Stacks operate under ‘Last In First Out’ (LIFO), 
+like a stack of plates - you would get to the bottom plate by first 
+removing the plates on top of it. Whereas queues operate under ‘First In
+First Out’ (FIFO), much like standing in a (well functioning) queue.</p>
+
+<p>Below I’ve implemented a stack object using the Python list. Stacks
+implement two methods to add (push) and delete (pop) data. The pop method
+usually doens’t accept any arguments as Stacks by their nature follow LIFO.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Stack</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">"""Implement using a list"""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stack</span> <span class="o">=</span> <span class="p">[]</span>
+ 
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stack</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">"""Check whether stack is empty"""</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stack</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="s">"""Add an item to top of stack"""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stack</span> <span class="o">+=</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
+    
+    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">"""Remove item from top of stack"""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stack</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>Python doesn’t offer stack primitives, but they do encourage the use of
+Python lists as stacks, as you can perform operations in a LIFO manner:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+
+<span class="c1"># add to top of stack
+</span><span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># pop from top of stack
+</span><span class="n">l</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+<span class="c1"># lists are truthy, so can check if empty:
+</span><span class="p">[]</span>  <span class="c1"># False
+</span><span class="ow">not</span> <span class="p">[]</span>  <span class="c1"># True
+</span>
+</code></pre></div></div>
+
+<h3 id="queues">Queues</h3>
+
+<p>Again, Python doesn’t offer a primitive queue object, so I’ve implemented
+the basic protocol below using a list. Additionally, the delete and insert
+operations are called dequeue and enqueue by convention for queues.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Queue</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">"""Implement using a list"""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="p">[]</span>
+        
+    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">"""Check if queue is empty"""</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">enqueue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="s">"""Add an item to back of the queue"""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">+=</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">dequeue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">"""Remove item from front of the queue"""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">[</span><span class="mi">0</span><span class="p">:]</span>
+</code></pre></div></div>
+
+<p>Although Python doesn’t offer queue or stack primitives, it does offer a
+built-in implementation for FIFO/LIFO objects through the <code class="highlighter-rouge">Queue</code> module 
+that ships with the standard library that fulfill both the simple 
+protocols above, with some extras. It would in general be wise to use this
+rather than implement your own, as they will have taken care to optimise
+the performance of the objects in comparison to the ones I’ve implemented
+above.</p>
+
+<p>What kind of problems can we use this technology for? Pretty much anything
+where you want to access data in a consistent way, for</p>
+
+<h3 id="analysis">Analysis</h3>
+
+<p>Stacks and Queues operations to insert and delete data are both $O(1)$. 
+This latter statement is a result of the fact that data access occurs in 
+a pre-defined manner (LIFO/FIFO). Therefore, when implementing an algorithm
+that relies on data access in some pre-defined manner, one should attempt
+to use a stack/queue. For example I made use of a queue to implement 
+<a href="2018/12/05/sorting-algorithms.html">breadth first search</a>,
+where I needed to store the next nodes to consider in order of consideration.</p>
+
+<h2 id="linked-lists-dynamic-arrays">Linked Lists (Dynamic Arrays)</h2>
+
+<p>In most low level programming languages, you have to declare how much 
+<em>stuff</em> can go in an array before putting in anything in by setting aside
+some memory when you create an array object. In doing this though, you
+quickly run into problems. Imagine you create an algorithm to process 
+the results of some mathematical calculation, each time you get a result
+you add it to an array, however setting your calculation off you quickly
+eat up all the memory you’ve allocated to your initial array, and you 
+have to create a new array object as a part of your algorithm. This could
+quickly get messy, with references to new arrays being created dynamically.
+(Singly) Linked Lists, or Dynamic Arrays, get around this problem by allowing you
+to extend arrays as you go. One does so by modelling each datum in the 
+array as being stored in a node, with pointer to the next datum.</p>
+
+<p>This model is pretty good, though it is a little fiddly to deal with 
+inserting and deleting data, the basic methods for a linked list, which
+I’ve implemented below, are again to do with the insertion and removal of
+data.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+    <span class="s">"""
+    Node to store data, and pointer to next node in linked list
+        as well as a pointer to the previous node.
+    """</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_next</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+
+
+<span class="k">class</span> <span class="nc">LinkedList</span><span class="p">:</span>
+    <span class="s">"""Implement using Nodes and Pointers"""</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">"""Some Python sugar to print a representation"""</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">ll</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">_next</span>
+
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">ll</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="s">"""Insert an element at the head of the list"""</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">node</span><span class="o">.</span><span class="n">_next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">node</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">node</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="s">"""Return the node that holds a given piece of data"""</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span>
+
+        <span class="k">while</span> <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="o">!=</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">_next</span>
+
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="s">"""Splice out a given node"""</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">x</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">_next</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">_next</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">_next</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">prev</span>
+
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">_next</span>
+</code></pre></div></div>
+<p>This is all well and good, but luckily you probably won’t have to ever
+fiddle around with a similar implementation of your own, as Python has
+you covered with the ever helpful list. Python lists amount to dynamic
+arrays which you can (within reason) keep appending data to. They
+are fantastic, versatile objects, with many more features than my little
+Linked List above. Specifically, my <code class="highlighter-rouge">remove</code> method fails to account for
+nodes with duplicate data, and my <code class="highlighter-rouge">insert</code> method can’t place a node
+anywhere but at the head of the linked list. Python lists allow you to 
+place items in a list by index, which is much more versatile than the
+above - which is the basic protocol for (singly) linked lists.</p>
+
+<h3 id="analysis-1">Analysis</h3>
+
+<p>Linked lists are ‘linear’, i.e. the way to search through them happens
+linearly - one node at a time. Therefore we can reason that the <code class="highlighter-rouge">search</code>
+method, and therefore the <code class="highlighter-rouge">remove</code> method are both $O(N)$, whereas the
+<code class="highlighter-rouge">insert</code> method is much cheaper as we always insert at the head of the
+list, and is $O(1)$. Therefore, these data structures are more useful when
+our algorithm needs to store data much more often than it needs to look
+it up.</p>
+
+<h2 id="rooted-trees">Rooted Trees</h2>
+
+<p>We can use a similar node-pointer model to represent rooted trees,
+in the context of this post we’ll only consider <strong>binary trees</strong>
+and <strong>binary search trees</strong>. As with linked lists, we’ll assume each node
+contains some data, the remaining attributes are the pointers to the other
+nodes, which will inevitable vary with the type of rooted tree.</p>
+
+<h3 id="binary-trees">Binary Trees</h3>
+
+<p>The nodes of binary trees can only point at most to two other nodes,
+hence <strong>binary</strong>. We refer to nodes, and the ones they point to as 
+‘parents’ and ‘children’, respectively,
+In terms of implementation, it’s a fairly common pattern I’ve seen
+<a href="http://cslibrary.stanford.edu/110/BinaryTrees.html">elsewhere</a> to specify
+binary (search) trees in an abstract manner. Using just a <code class="highlighter-rouge">Node</code>
+object, with pointers to a given node’s parent, and two children.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+    <span class="s">"""Implement a tree by specifying relations between nodes."""</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left_child</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right_child</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+</code></pre></div></div>
+
+<p>In terms of manipulating this structure to view/insert/delete data we
+can implement common tree-traversal methods. Below, I’ve implemented a
+<code class="highlighter-rouge">lookup</code> method to find a given node in binary (search) tree using in-order
+traversal:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="s">"""
+    Lookup a given value in a binary tree, starting the search at
+        a specified root node. Returns True if value is contained,
+        within tree, False otherwise.
+    """</span>
+    <span class="k">if</span> <span class="n">node</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="n">value</span>
+            <span class="ow">or</span> <span class="n">lookup</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left_child</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">lookup</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right_child</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">return</span> <span class="bp">False</span>
+</code></pre></div></div>
+
+<h3 id="binary-search-trees">Binary Search Trees</h3>
+
+<p>Binary search trees have the additional property that all child nodes to
+the left of a given node contain data in of smaller or equal value to the
+datum in that node, and all nodes to it’s right contain data of greater
+value. For integers this is obvious, but less so for things like strings.
+Where you may have to map the data you’re storing back to unique integers
+in order to store it. Using this we can write a simple method to insert
+data into Binary Search Trees.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># construct a simple BST with empty leaf nodes
+</span><span class="n">n2</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">n1</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">n3</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">n2</span><span class="o">.</span><span class="n">left_child</span> <span class="o">=</span> <span class="n">n1</span>
+<span class="n">n2</span><span class="o">.</span><span class="n">right_child</span> <span class="o">=</span> <span class="n">n3</span>
+<span class="n">n1</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">n2</span>
+<span class="n">n3</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">n2</span>
+
+<span class="n">n3</span><span class="o">.</span><span class="n">left_child</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="n">n3</span><span class="o">.</span><span class="n">right_child</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="n">n3</span><span class="o">.</span><span class="n">left_child</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">n3</span>
+<span class="n">n3</span><span class="o">.</span><span class="n">right_child</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">n3</span>
+
+<span class="n">n1</span><span class="o">.</span><span class="n">right_child</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="n">n1</span><span class="o">.</span><span class="n">left_child</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="n">n1</span><span class="o">.</span><span class="n">left_child</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">n1</span>
+<span class="n">n1</span><span class="o">.</span><span class="n">right_child</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">n1</span>
+
+ 
+<span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">pointer</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s">"""
+    Insert data into Binary Search Trees
+        Begin by looking up whether or not a node exists with this value
+        in the tree. If it does not, we have to recurse down the tree to
+        find an appropriate place to store the value.
+    """</span>
+    <span class="k">if</span> <span class="n">node</span> <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="n">node</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="n">pointer</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">left_child</span>
+            <span class="n">insert</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left_child</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">pointer</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pointer</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">right_child</span>
+            <span class="n">insert</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right_child</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">pointer</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pointer</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">value</span>
+</code></pre></div></div>
+
+<p>I’ve used a similar recursive strategy to implement <code class="highlighter-rouge">insert</code> and <code class="highlighter-rouge">lookup</code>
+above. This is because recursion pops out fairly naturally when manipulating
+trees, mostly beacuse we’ll want to consider each node of a tree in a
+linear manner, often based on a condition, but the data structure is 
+itself clearly non-linear.</p>
+
+<p>Python doesn’t offer any tree primitives, so are they really that useful?
+I think a lot people understimate the importance of trees. Famously the
+author of <a href="https://twitter.com/mxcl/status/608682016205344768">Homebrew</a>
+complained about being rejected from Google for ‘failing to invert a 
+binary tree’, which he thought was BS as he had created software that 
+pretty much all Mac coders use. Initially I was inclined to side with him,
+but I read this 
+<a href="https://thecodebarbarian.com/i-dont-want-to-hire-you-if-you-cant-reverse-a-binary-tree">blog post</a> 
+that really changed my mind on the issue.</p>
+
+<p>So why doesn’t Python implement tree primitives despite them being so
+important in Computer Science? The truth is it does, a more complex abstraction
+such as a Python dictionary, or a JSON object is built on top of a tree like
+structure. In terms of raw trees, much like my implementation of a linked
+list earlier, Python’s creators probably thought it was more useful in 
+terms of solving problems to wrap the basic abstraction inside a higher
+level concept, which when you think about it is. Do you really want to
+implement a tree traversal method, every time you want to look up an item
+in a <code class="highlighter-rouge">dict</code> like structure?</p>
+
+<h3 id="analysis-2">Analysis</h3>
+
+<p>My recursive tree methods above go through each node, one by one,
+operating on a constructed tree in-place. Therefore, they are of $O(1)$
+in space, and of $O(log(N))$ in time. This comes from the number of levels
+in a binary tree, which can be found by using a similar argument to that
+of <a href="2018/12/05/sorting-algorithms.html">merge sort</a>. But as a binary tree
+could degenerate into a linked-list, this time complexity in the worst
+case would be $O(N)$.</p>
+
+<h2 id="hash-tables">Hash Tables</h2>
+
+<p>Hash tables are the most effective way of representing an abstratction
+for <code class="highlighter-rouge">dictionary</code> like objects. i.e. where we want to read, update, and
+insert data by reference to some name. In theory names (or hashes) are
+difficult to create uniquely (search for hash collisions), but in practice
+most hashing algorithms are sound enough to make collisions very rare indeed.
+This lookup can be very efficient, $O(1)$, as long as we can guarantee
+unique hashes.</p>
+
+<p>I’ve built a fairly contrived implementation below, using Python lists
+as the underlying data structure. I’ve used lists to handle potential
+hash collision, i.e. if a hash for a particular value corresponds to
+a hash for some other value, by using a list to store values you can
+handle collisions.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">small_hash</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span>
+
+<span class="k">class</span> <span class="nc">HashTable</span><span class="p">:</span>
+    <span class="s">"""Simple Hashtable implementation using Python lists"""</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># buffer space
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_table</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mf">10e5</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">[</span><span class="n">small_hash</span><span class="p">(</span><span class="n">v</span><span class="p">)]))</span>
+
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">small_hash</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">small_hash</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>In reality you would never bother implementing the above code in Python
+as dictionaries are primitives in the language, and in many other languages
+both interpreted and compiled.</p>
+
+<h3 id="analysis-3">Analysis</h3>
+
+<p>If you’re hashing algorithm is decent, you should be able to perform
+lookups/inserts in $O(1)$ on average.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Data structures are a very deep topic, and I’ve scratched the surface
+here with simple implementations, of fairly simple data structures. For
+example, the hash table I’ve implemented is one in which I’ve not optimised
+the hash function to reduce collisions, or considered really the type of
+problem I’d wish to solve (and hence the underlying data structure it
+should rely on). However, it’s a good start for anyone interesting in
+studying the topic, and CLRS is really the place to supplemement this
+post.</p>
+:ET

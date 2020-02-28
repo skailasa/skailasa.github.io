@@ -1,0 +1,43 @@
+I"<h1 id="cv">CV</h1>
+
+<h2 id="experience">Experience</h2>
+
+<h3 id="cytora-2017-2018">Cytora, 2017-2018</h3>
+
+<p>I joined a Cytora pre-series A. I’ve worked on a variety of projects, but
+these have all had something to do with processing large-ish datasets 
+quickly/well.</p>
+
+<p>My main project was the development of a search service, through this I
+became very well acquainted with the ElasticSearch API.</p>
+
+<p>Stack: Python, GCP, ElasticSearch, Postgres (Docker, K8s)</p>
+
+<h3 id="cambridge-quantum-computing-summer-2017">Cambridge Quantum Computing, Summer 2017</h3>
+
+<p>I spent a summer interning at a Cambridge University spin-out company.
+This was when I still held aspirations of pursing physics, and spent
+the summer writing simulations for potential architectures for quantum
+computers.</p>
+
+<h3 id="the-humboldt-university-of-berlin-summer-2016">the Humboldt University of Berlin, Summer 2016</h3>
+
+<p>I was an intern here too, in Computational Neuroscience. I was writing
+simulations in Python, and in general struggling to keep up with a lot of
+biology.</p>
+
+<h2 id="education">Education</h2>
+<h3 id="university-college-london-2018-2020">University College London, 2018-2020</h3>
+
+<p>I will be at UCL for the foreseeable future studying for a MSc in
+Scientific Computing. My coursework is fairly diverse, but revolves around 
+mathematical, statistical and computational modelling. My Master’s
+project focuses on Deep Learning, specifically on training methodologies
+for autoencoders.</p>
+
+<h3 id="durham-university-2013-2017">Durham University, 2013-2017</h3>
+
+<p>I completed an integrated Masters in Physics at Durham. I spent a lot of
+time struggling to understand and spell “Brillouin Zones”, and a lot more
+time adjusting to the blistering cold of the North East of England.</p>
+:ET

@@ -1,0 +1,105 @@
+I"P<p>A storm is raging outside in London, and the world is on the brink of 
+a Coronavirus pandemic, but have you always wanted to know just what a Y
+Combinator was didn’t you? The phrase has been popularised by the startup
+school of the same name, and there’s actually some very interesting mathematics
+behind it.</p>
+
+<h2 id="1-what-is-it-for">1) What is it for?</h2>
+
+<p>It helps to define recursive functions in the lambda calculus.
+Let’s break that down. Recursion is the cornerstone of control flow in the
+functional style of programming. However, it’s not possible to define recursive
+functions in the lambda calculus. The lambda calculus is just a set of simple
+rules that underpin functional programming, that allows one to express 
+arbitrary computations in terms of the application of functions to inputs and
+get outputs, it’s so simple that it doesn’t make space for recursive
+functions.</p>
+
+<h2 id="2-lightspeed-lambda-calculus">2) Lightspeed Lambda Calculus.</h2>
+
+<p>The lambda abstraction allows you to express an anonymous function in the lambda
+calculus, and will be very familiar with Python programmers who’ve used Python’s
+anonymous functions.</p>
+
+<p>Consider the increment function written using Python lambdas,</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+</code></pre></div></div>
+<p>And an equivalent definition using the lambda calculus (with a dyadic addition
+operator).</p>
+
+<script type="math/tex; mode=display">\lambda x . x + 1</script>
+
+<p>You can see the obvious resemblence. The variable ‘x’ is bound to the function
+in the sense that it’s not making reference to an ‘x’ defined elsewhere in your
+lambda expression, (or your code if you were programming).</p>
+
+<h2 id="2-reduction-in-the-lambda-calculus">2) Reduction in the lambda calculus</h2>
+
+<p>Just like in other forms of calculus (in my definition, justmethods of calculating things) we need
+some way of simplfying expressions we write down. The lambda calculus defines 3 basic ways of doing this, and they are called ‘reduction’ methods.</p>
+
+<p>$\alpha$ reduction basically says that you can rename variables, and your 
+lambda expressions’ meaning remains unchanged.</p>
+
+<script type="math/tex; mode=display">\lambda x. x \rightarrow \lambda y. y</script>
+
+<p>$\beta$ reduction says that when you apply your lambda abstraction to an
+expression, all free instances in your abstraction’s expression of the abstraction’s parameter are replaced with the new expression. That’s kind of
+a mouthful, but it’s easy to see visually.</p>
+
+<script type="math/tex; mode=display">(\lambda x. x + 1) \> 4 \rightarrow 4+1 = 5</script>
+
+<p>This looks a lot like (and in fact is) like currying a function for
+partial application. The instances of ‘x’ in the lambda abstraction’s expression (x+1) are replaced with 4.</p>
+
+<p>Finally there’s $\eta$ reduction. Which states that when there are no bound
+instances of the lambda abstraction’s parameter in it’s expression and it’s
+expression is a function, the following identity holds,</p>
+
+<script type="math/tex; mode=display">\lambda x. F \rightarrow F</script>
+
+<h2 id="4-the-y-combinator">4) The Y Combinator</h2>
+
+<p>Believe it or not, that’s enough to at least see where the Y Combinator comes
+from, if not understand it particularly deeply. Our lambda calculus helps us
+write functions in terms of inputs and outputs, and we also have a way to
+simplify (reduce) complex lambda abstractions, into simpler ones (normalise).</p>
+
+<p>But in functional programming we face a problem, which is that control flow
+is often defined by recursion, and we’ve no way to account for this using the
+simple tools above.</p>
+
+<p>Consider this function written recursively to find factorials,</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">FAC</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">n</span><span class="o">*</span><span class="n">FAC</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+<p>The lambda expression for this is</p>
+
+<script type="math/tex; mode=display">\text{FAC} = (\lambda n. \text{if} \> (= \> n \> 0) \> 1 \> (* \> n \> (\text{FAC} (- \> n \> 1))))</script>
+
+<p>This admittedly is a little more complicated than the examples above. But by
+noting that the arithmetic operators (+/=/* etc) are partially applied to two
+arguments, it should be possible to read that it’s doing the same operation
+as the python code above.</p>
+
+<p>Let’s simplify this by writing it as,</p>
+
+<script type="math/tex; mode=display">\text{FAC} = \lambda n. (...\text{FAC}...)</script>
+
+<p>We can do a reverse $\beta$ reduction (known as a $\beta$ ‘abstraction’ - confusingly) on this to get,</p>
+
+<script type="math/tex; mode=display">\text{FAC} = (\lambda \text{fac}. \>  (\lambda n. \> (...\text{fac}...))) \text{FAC}</script>
+
+<p>which you can verify. Why does this help, this loooks worse! However, we can
+now see that the above expression is of the form,</p>
+
+<script type="math/tex; mode=display">\text{FAC} = \text{H} \> \text{FAC}</script>
+
+<p>Where $\text{H}$ is some function, and if we feed the input $\text{FAC}$ into
+this function we return $\text{FAC}$. For ordinary algebra this is like feeding 0 into the function f(x) = x. In mathematics, this is known as a
+fixed point.</p>
+:ET

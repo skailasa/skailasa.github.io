@@ -1,0 +1,294 @@
+I"JQ<p>I’ve recently begun the journey from calm Python pastures to becoming a full
+stack programmer. This involves learning a lot of new technologies, and after
+teaching myself how to code reasonably well in Python I thought nothing of
+learning a much more involved technology like C++. This might seem futile, or
+pointless from the perspective of other developers whose focus may be on making
+dollar ASAP. However C++ comes with the advantage of offering peaks behind
+the compiler to begin to understand how your calculations are being crunched,
+so a good understanding will be crucial if you are to ever call yourself an
+expert programmer. Plus many other object-oriented languages are probably trivial
+once you’ve wrestled with a massive C++ project, so I tell myself.</p>
+
+<p>In any case I’m going to tackle one of the first concepts that seemed novel to 
+me in my study which is that of pointers and references, and specifically how
+C++ as a language handles these.</p>
+
+<h2 id="pointers">Pointers</h2>
+
+<p>Just as in Python, C++ allows one to assign variables to some bit of memory, in 
+C++ these are also typed:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Assigns the variable <code class="highlighter-rouge">x</code> with the integer value <code class="highlighter-rouge">7</code>. We can also ‘point’ to the
+location in memory where a value is stored, without restoring it somewhere else.
+Python actually handles this for you implicitly whenever you use two variables
+to refer to the same value (they point to the same location in memory) but in
+C++ as with many other things one has to do this themselves. Pointers are also
+strongly typed, much like variables.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="o">*</span><span class="n">ip</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>We can then use this ‘integer pointer’ to point to a memory address containing
+an integer:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ip</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Here the ampersand is called the reference operator (or the address of an operator).
+It returns the address of an object, for assignment to pointers.</p>
+
+<p>We can ‘dereference’ pointers, returning the value they point to, by using the
+pointer ‘dereference’ operator:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y</span> <span class="o">=</span> <span class="o">*</span><span class="n">ip</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Which is the same as the pointer initialisation operator, but different by
+context.</p>
+
+<h2 id="references">References</h2>
+
+<p>Consider the following code, there’s quite a bit to unpack here. Firstly notice
+how there’s no need to use an asterisk to dereference a reference. <code class="highlighter-rouge">y</code> is just
+called normally. Secondly, once a reference is defined <strong>it cannot be changed</strong>.
+So when I set <code class="highlighter-rouge">y = 42</code> it doesn’t ‘change the value of <code class="highlighter-rouge">y</code>’ it simply changes <code class="highlighter-rouge">x</code>!</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;cstdio&gt;
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="o">&amp;</span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"The value of x is %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"The value of y is %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"The value of x is %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="examples">Examples</h1>
+
+<p>So, with that basic knowledge in mind, let’s go on a whirlwind tour of where this
+comes into play in the C++ language.</p>
+
+<h2 id="pointing-toreferencing-arrays">Pointing to/referencing arrays</h2>
+
+<p>Arrays are a primitive in C++, and very similar to the Python type.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Initialised array that can contain 5 values</span>
+<span class="kt">int</span> <span class="n">ia</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span>
+
+<span class="c1">// Can assign by index like in Python</span>
+<span class="n">ia</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="c1">// Can also index elements as if the array was a pointer</span>
+<span class="c1">// This statement is exactly the same as the previous statement</span>
+<span class="o">*</span><span class="n">ia</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="c1">// Integer pointer pointing to an array</span>
+<span class="kt">int</span> <span class="o">*</span><span class="n">ip</span> <span class="o">=</span> <span class="n">ia</span><span class="p">;</span>
+
+<span class="c1">// The address operator isn't needed above, because arrays can be</span>
+<span class="c1">// Accessed like pointers. The following statement assigns a value to</span>
+<span class="c1">// The first element of the array. Because the pointer was initialised</span>
+<span class="c1">// to the address of the array, it points to the first element.</span>
+<span class="o">*</span><span class="n">ip</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="o">++</span><span class="n">ip</span><span class="p">;</span>
+
+<span class="c1">// Can incremement the pointer to point to the second element! C++ pointers</span>
+<span class="c1">// Are strongly typed, so it knows the size of the element it's pointing to</span>
+<span class="c1">// The following statement assigns the value 3 to the second element in</span>
+<span class="c1">// The array.</span>
+<span class="o">*</span><span class="n">ip</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+
+<span class="c1">// Shortcut, assigning 4 to the 3rd array element:</span>
+<span class="o">*</span><span class="p">(</span><span class="o">++</span><span class="n">ip</span><span class="p">)</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Using the above techniques, we can use pointers to loop through C++ array
+primitives:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;cstdio&gt;
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> 
+<span class="p">{</span>
+    <span class="kt">char</span> <span class="n">s</span><span class="p">[]</span> <span class="o">=</span> <span class="s">"Sri"</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"The string being iterated over is:%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
+    
+    <span class="k">for</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">cp</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span> <span class="o">*</span><span class="n">cp</span><span class="p">;</span> <span class="o">++</span><span class="n">cp</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"char is %c</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="o">*</span><span class="n">cp</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="cm">/*
+Expected output:
+char is:S
+char is:r
+char is:i
+*/</span>
+</code></pre></div></div>
+
+<p>How does this loop work? Well we’ve used a trick here, namely that C++ arrays
+end with a <code class="highlighter-rouge">0</code>, which has a bool value of <code class="highlighter-rouge">False</code>. Therefore the loop basically
+iterates whilst the condition is <code class="highlighter-rouge">True</code>, i.e. until the end of the string, starting
+with the first character which is pointed to by the character pointer <code class="highlighter-rouge">*cp</code>.</p>
+
+<h2 id="passing-arguments-by-reference">Passing arguments by reference</h2>
+
+<p>Pointers and references let you write functions to operate on objects inplace.
+This is obviously useful when you have the potential to be copying around
+objects of unknown size.</p>
+
+<p>Here’s a common usage pattern, consider a function that returns a reference,
+and also takes a reference as its argument. What’s the expected output?</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;cstdio&gt;
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="o">&amp;</span> <span class="n">f</span><span class="p">(</span><span class="kt">int</span> <span class="o">&amp;</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">++</span><span class="n">n</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> 
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"f() is %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"i is %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Well, what happens is the function operates on <code class="highlighter-rouge">i</code> inplace, by operating on
+the reference to <code class="highlighter-rouge">i</code> and returning the same reference. This has obvious use cases
+when we don’t want to be copying around an object of potentially unknown size.</p>
+
+<p>However there is also a potential for side effects here, from the fact that
+unless you look at the function signature there is no way to actually tell from
+just the main statement that the variable <code class="highlighter-rouge">i</code> is changed in place.</p>
+
+<p>It may be better to make use of pointers where we have side effects, as this
+presents itself a little more clearly in the code. However, I’ve seen this
+pattern used throughout the C++ standard library, so I suppose it’s all about
+personal taste.</p>
+
+<p>Below I’ve written equivalent code to operate on a variable inplace using
+pointers rather than references. As you can see, it makes it a little bit
+clearer that the variable <code class="highlighter-rouge">n</code> is being operated on inplace.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;cstdio&gt;
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">f</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="o">*</span><span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">*</span><span class="n">n</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="o">*</span><span class="n">np</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">n</span><span class="p">;</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"n is %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"f(n) is %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">np</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"n is now %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>There is a practical reason to do this to, rather than just aesthetic/neat.
+Function variables are stored on the ‘stack’, this is a relatively small space,
+passing values to a function causes them to be copied onto the stack. If they
+are too large, it can cause the <a href="https://xkcd.com/979/">stack to overflow</a>, and
+create security vulnerabilities in your software. This also means that we can’t
+really return anything particularly large in a C++ function either, as this could
+also cause the stack to overflow.</p>
+
+<p>However, how do you get rid of the potential side-effects, if they are not
+desired, or intended - especially as your code gets more complicated than what
+I’ve written above? You would use a <code class="highlighter-rouge">const</code> qualifier to protect your data:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;cstdio&gt;
+#include &lt;string&gt;
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">func</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span> <span class="o">&amp;</span> <span class="n">s</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"the value is %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">s</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">string</span> <span class="n">s</span> <span class="o">=</span> <span class="s">"srinath"</span><span class="p">;</span>
+    <span class="n">func</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here, the <code class="highlighter-rouge">const</code> keyword protects the variable <code class="highlighter-rouge">s</code> from being changed in the
+function <code class="highlighter-rouge">f</code>, whilst still giving us access to it’s value (<code class="highlighter-rouge">srinath</code>).</p>
+
+<h2 id="function-pointers">Function pointers</h2>
+
+<p>C++ let’s you point to functions (they are first-class objects), much like any
+other object:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;cstdio&gt;
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">func</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"This is the func()"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>   
+    <span class="c1">// slightly odd declaration for function pointer</span>
+    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">pfunc</span><span class="p">)()</span> <span class="o">=</span> <span class="n">func</span><span class="p">;</span>
+    <span class="c1">// can then use as normal!</span>
+    <span class="n">pfunc</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Why would you want to do this? Well one pattern I found was the ability to store
+a bunch of related functions together (although it could be argued that a class
+might be a better approach).</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;cstdio&gt;
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">fa</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"This is function a"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">fb</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"This is function b"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// store function pointers in an array using initialiser list </span>
+<span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">funcs</span><span class="p">[])()</span> <span class="o">=</span> <span class="p">{</span><span class="n">fa</span><span class="p">,</span> <span class="n">fb</span><span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+ <span class="n">funcs</span><span class="p">[</span><span class="mi">0</span><span class="p">]();</span>
+ <span class="n">funcs</span><span class="p">[</span><span class="mi">1</span><span class="p">]();</span>
+ <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>   
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Understanding memory management is probably the biggest step from scripting to
+proper compiled languages, and pointers and references are the first stepping
+stone on that path. In a future post, I think I’ll go through something a bit
+more engineering-y in C++, specifically how to set up a development environment
+and create a library - as this turns out to be super involved in comparison to
+any scripting language like JavaScript or Python.</p>
+:ET

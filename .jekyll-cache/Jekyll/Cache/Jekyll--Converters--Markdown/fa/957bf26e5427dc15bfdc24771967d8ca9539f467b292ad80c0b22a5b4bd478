@@ -1,0 +1,327 @@
+I"ڍ<p>Regular listeners, if there are any, might know that I study Scientific Computing.
+A field all about simulating real world phenomena using the latest technology. As
+this is largely dominated by old-school maths and physics types, we are resultantly
+studying some fairly old school tech, and in one of my courses we’ve been studying MPI
+(Message Passing Interface). It’s basically a C++ library that allows you to model 
+distributed memory systems, with 90s supercomputers in mind. This has begun to draw
+<a href="https://www.dursi.ca/author">criticism</a>. This is fair enough, the prevalence of entirely
+new technologies for solving large numerical systems (Hadoop, Spark) and the ubiquity
+of cloud compute make HPC seem quite antiquated, and definitely at the wrong level of
+abstraction (why are research scientists focussing on messaging, when they should be
+focusing on the algorithms?). However, it’s ubiquity as the tool of choice amongst HPC 
+scientists makes knowledge of it important (for now). Parallel programming concepts are 
+pretty agnostic to tools, so I thought I’d go through a simple MPI example demonstrating 
+some parallellism.</p>
+
+<p>We’re gonna go through a dummy program that parallelises the finding of a prime number within
+some user defined range of numbers. The fundamental computational complexity of this problem
+is O(N), we basically are gonna check every number in some range, but we can speed up all of
+this checking by chopping up this range and feeding it to different processes to go off and 
+do <em>in parallel</em>.</p>
+
+<p>Consider the following function which checks for primality.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;math.h&gt;
+</span>
+<span class="k">namespace</span> <span class="n">num</span> 
+<span class="p">{</span>
+<span class="kt">bool</span> <span class="n">IsPrime</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">candidate</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">bool</span> <span class="n">isPrime</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">candidate</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">candidate</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">isPrime</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">candidate</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">isPrime</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">else</span>
+  <span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="n">limit</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="n">candidate</span><span class="p">))));</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">factor</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="n">factor</span> <span class="o">&lt;=</span> <span class="n">limit</span><span class="p">;</span> <span class="o">++</span><span class="n">factor</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">candidate</span> <span class="o">%</span> <span class="n">factor</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="p">{</span>
+        <span class="n">isPrime</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">isPrime</span><span class="p">;</span>	
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="communication-in-mpi">Communication in MPI</h2>
+
+<p>MPI, as the name suggests, is all about controlling how processs communicate (pass messages)
+to each other. These messages could indicate instructions such as the starting and stopping
+of a computation, or contain data. Furthermore, there are two paradigms in which MPI handles
+communications, ‘point to point’ and ‘collective’. Point to point, as the name indicates, is
+about specifying the communication between two named processes, similarly collective
+communication is about specifying communications across groups of processes.</p>
+
+<h2 id="point-to-point-communication">Point to Point Communication</h2>
+
+<p>A common pattern is have a ‘master’ process tell a bunch of ‘slave’ processes what to do. All
+the compute happens at the slaves, with the master just choraling the action. A few points for
+clarity, before we continue, ‘rank’ in MPI refers to the unique name of a process, it’s common
+to have the rank=0 process be the master. Additionally ‘size’ refers to the total number of
+processers available on your machine. My measly 2013 MacBook Air has just 2 cores, hence only
+a master with a single slave.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+</span>
+<span class="cp">#include &lt;mpi.h&gt;
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+	<span class="cm">/***********************Ignore this stuff***********************/</span>
+	<span class="n">MPI_Init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">argc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">argv</span><span class="p">);</span>
+	
+	<span class="kt">int</span> <span class="n">world_rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">;</span>
+	<span class="n">MPI_Comm_rank</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">world_rank</span><span class="p">);</span>
+	<span class="n">MPI_Comm_size</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">world_size</span><span class="p">)</span>
+	<span class="cm">/****************************************************************/</span>
+	<span class="c1">// Random number generation</span>
+ 	<span class="n">std</span><span class="o">::</span><span class="n">minstd_rand</span> <span class="n">generator</span><span class="p">;</span>
+	<span class="kt">unsigned</span> <span class="n">min</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">max</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+	<span class="n">std</span><span class="o">::</span><span class="n">uniform_int_distribution</span><span class="o">&lt;&gt;</span> <span class="n">distribution</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
+
+	<span class="c1">// Create buffer to store prime number candidates</span>
+	<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="o">&gt;</span> <span class="n">candidates</span><span class="p">(</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+
+	<span class="c1">// Buffer to store the prime that is found</span>
+	<span class="kt">int</span> <span class="n">found_prime</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+	<span class="c1">// Main loop continues until a prime is found</span>
+	<span class="k">while</span> <span class="p">(</span><span class="n">found_prime</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    	<span class="k">if</span> <span class="p">(</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Generate some candidate numbers for each process to test</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">generate</span><span class="p">(</span><span class="n">candidates</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">candidates</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span>
+                          <span class="p">[</span><span class="o">&amp;</span><span class="p">]()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">distribution</span><span class="p">(</span><span class="n">generator</span><span class="p">);</span> <span class="p">});</span>
+
+            <span class="c1">// Send one to each worker, don't send one to master</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">worker</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="n">worker</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">worker</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">MPI_Ssend</span><span class="p">(</span><span class="o">&amp;</span><span class="n">candidates</span><span class="p">[</span><span class="n">worker</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MPI_UNSIGNED</span><span class="p">,</span>
+                		  <span class="n">worker</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MPI_COMM_WORLD</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="c1">// Receive result of prime check</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">worker</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="n">worker</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">;</span> <span class="o">++</span><span class="n">worker</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kt">unsigned</span> <span class="n">result</span><span class="p">;</span>
+                <span class="n">MPI_Recv</span><span class="p">(</span><span class="o">&amp;</span><span class="n">result</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MPI_UNSIGNED</span><span class="p">,</span> <span class="n">worker</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                         <span class="n">MPI_COMM_WORLD</span><span class="p">,</span> <span class="n">MPI_STATUS_IGNORE</span><span class="p">);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">found_prime</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">[</span><span class="n">worker</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+                    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"Worker "</span> <span class="o">&lt;&lt;</span> <span class="n">worker</span> <span class="o">&lt;&lt;</span> <span class="s">" found prime "</span>
+                              <span class="o">&lt;&lt;</span> <span class="n">found_prime</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+    	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="c1">// Receive the candidate to check</span>
+            <span class="kt">unsigned</span> <span class="n">candidate</span><span class="p">;</span>
+            <span class="n">MPI_Recv</span><span class="p">(</span><span class="o">&amp;</span><span class="n">candidate</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MPI_UNSIGNED</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> 
+            		 <span class="n">MPI_COMM_WORLD</span><span class="p">,</span> <span class="n">MPI_STATUS_IGNORE</span><span class="p">);</span>
+            <span class="c1">// Do the check</span>
+            <span class="kt">unsigned</span> <span class="n">is_prime</span> <span class="o">=</span> <span class="n">mp</span><span class="o">::</span><span class="n">IsPrime</span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="c1">// Return the result</span>
+            <span class="n">MPI_Ssend</span><span class="p">(</span><span class="o">&amp;</span><span class="n">is_prime</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MPI_UNSIGNED</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MPI_COMM_WORLD</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">is_prime</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">found_prime</span> <span class="o">=</span> <span class="n">candidate</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="cm">/***********************Ignore this stuff***********************/</span>
+    <span class="n">MPI_Finalize</span><span class="p">();</span>
+    <span class="cm">/****************************************************************/</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>There’s a huge amount to unpack above, so I’m going to focus on the important parts.
+As mentioned, MPI consists of messages passed between processes, which they can either
+be in the process of ‘sending’ or ‘receiving’. In our algorithm, we want the master
+process to send a prime it’s generated to a slave process and command it to check whether
+or not it is prime, returning the answer. Therefore it’s extremely important that the
+number of ‘sends’ and ‘receives’ exactly match, otherwise a process will be waiting
+around for a signal to do something else, which will never actually arrive. This situation
+is known as deadlock. Deadlock can also occur for other reasons too. Consider the following
+pseudo-code.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Check if we're on the master</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// If we're on the master send of message</span>
+	<span class="kt">int</span> <span class="n">msg</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">receipt</span><span class="p">;</span>
+	<span class="n">MPI_Ssend</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MPI_INT</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MPI_COMM_WORLD</span><span class="p">);</span>
+	<span class="n">MPI_Recv</span><span class="p">(</span><span class="o">&amp;</span><span class="n">receipt</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MPI_INT</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// if we're on the single worker, unpack the message</span>
+	<span class="kt">int</span> <span class="n">msg</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">receipt</span><span class="p">;</span>
+	<span class="n">MPI_Recv</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MPI_INT</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MPI_COMM_WORLD</span><span class="p">,</span> <span class="n">MPI_STATUS_IGNORE</span><span class="p">);</span>
+	<span class="n">MPI_Ssend</span><span class="p">(</span><span class="o">&amp;</span><span class="n">receipt</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MPI_INT</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MPI_COMM_WORLD</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Ignoring the actual syntax for a second, two things are clear from the above code. Both statements
+are executed at the same time - but on different processors. The first block is executed on the
+master, which we verify with a rank check, similarly for the slave. The master sends off a message
+whilst the slave’s first instruction is to wait to receive a message. If the slave’s first action is
+to also send a message, we’d get deadlock - as both master and slave are waiting around for a receipt.
+The worst part about MPI is that all of these failures are completely silent. So we have to make sure
+as developers that all of our communications are correct, manually, with no help from the compiler at
+all.</p>
+
+<p>So before even diving into syntax, we’ve found two potential pitfalls that could result in deadlock.
+(1) the calls to send and receive don’t match (2) messages are never received resulting in processes
+running forever waiting for a receipt.</p>
+
+<p>How do we solve these? In the above solution I’ve placed both rank checks within a while loop. This
+ensures that as long as the for loops - sending off messages to the slaves - do NOT send a message
+to the master itself, then the number of sends will always match the number of receives. A side 
+effect of this is that the code will completely fail if we only have one process (though this can
+be gotten around with collective communication as we shall see). Secondly, after we have a prime
+we have to signal explicitly <strong>to both the master and the slave(s)</strong> that it’s time to wrap up all
+computations. Otherwise they’ll be stuck in the while forever. This is done by checking the receipt
+<code class="highlighter-rouge">is_prime</code>.</p>
+
+<p>Moving onto syntax, MPI can at first seem incredibly intimidating. With massive function signatures
+and confusing parameter names being passed around, and of course a massive amount of boilerplate
+that doesn’t really seem to do anything - but is vital for the whole thing not crashing. This is all
+kind of annoying, but I’ve gotten used to it now after a few weeks of playing around with it, and I
+guess this is one of the reasons actual MPI developers can’t be bothered changing anything, habit…</p>
+
+<p>In the above example we basically use two MPI function calls <code class="highlighter-rouge">MPI_Ssend</code> and <code class="highlighter-rouge">MPI_Recv</code>. Their 
+parameters seem confusing, and I defer to the <a href="https://www.open-mpi.org/doc/">docs</a> for what all of 
+them even are, but for our purposes it’s enough to know that Ssend is a <strong>blocking-synchrnous send</strong> 
+which means that the sender waits for a receipt before moving onto another task. Similarly Recv is a
+<strong>blocking receive</strong>, also waiting for the confirmation of receipt before moving onto another task. 
+This gives us a sense of safety that our buffers won’t be overwritten whilst our processes are 
+communicating. However, in less trivial examples, could massively impact performance.</p>
+
+<h2 id="collective-communication">Collective Communication</h2>
+
+<p>The above solution is quite fiddly, we had to be extremely careful to avoid
+deadlock with the indices in the above loops. MPI maintainers have gotten around
+this kind of problem though by wrapping this kind of functionality, where we need
+to interact with all processes, in separate functions allowing the developer to
+forget about what’s actually going on in terms of the minutae of whether a single
+process has received it’s signal to terminate.</p>
+
+<p>We can replace the loops above with ‘Scatter’ which is a wrapper function to
+send of chunks of a buffer from a master process to different slave processes. Once
+We’ve found a prime at a slave process, we tell all the other processes to stop whatever
+they were doing and shut down.</p>
+
+<p>This code may not look any simpler, but it is, and has a couple of big advantages. Firstly
+the folks at MPI have made these functions clever enough that we can send a non-blocking
+bit of info to the master node (rank = 0), meaning that it can be used for computation AND
+coordination. Secondly, we’ve removed the burden of checking whether all of our receives match
+our sends. We still have to make sure that all processes know when to shut down, but this is
+bundled in a single <code class="highlighter-rouge">MPI_Allgather</code> function call rather than before when we had to be so
+meticulous with the indices, making deadlock much easier to handle than before. This code 
+should work for any number of processes, even with just one.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kt">void</span> <span class="nf">computePrimesInParallel</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">rank</span><span class="p">,</span> <span class="n">size</span><span class="p">;</span>
+    <span class="n">MPI_Comm_rank</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">rank</span><span class="p">);</span>
+    <span class="n">MPI_Comm_size</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
+
+    <span class="c1">// Random number generation</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">minstd_rand</span> <span class="n">generator</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="n">min</span><span class="p">(</span><span class="mi">22</span><span class="p">),</span> <span class="n">max</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">uniform_int_distribution</span><span class="o">&lt;&gt;</span> <span class="n">distribution</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
+
+    <span class="c1">// Calculate elements per process</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">elementsPerProcess</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+
+    <span class="kt">unsigned</span> <span class="n">found_prime</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">found_prime</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="o">&gt;</span> <span class="n">subsetOfArray</span><span class="p">(</span><span class="n">elementsPerProcess</span><span class="p">);</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="o">&gt;</span> <span class="n">candidates</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
+
+        <span class="c1">// Generate candidates to check for primality</span>
+        <span class="c1">// Create some candidate numbers for each process to test</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">generate</span><span class="p">(</span><span class="n">candidates</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">candidates</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span>
+                      <span class="p">[</span><span class="o">&amp;</span><span class="p">]()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">distribution</span><span class="p">(</span><span class="n">generator</span><span class="p">);</span> <span class="p">});</span>
+
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"number of candidate: "</span> <span class="o">&lt;&lt;</span> <span class="n">candidates</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+        <span class="c1">// Scatter accross all processes including root</span>
+        <span class="n">MPI_Scatter</span><span class="p">(</span><span class="n">candidates</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span> <span class="n">elementsPerProcess</span><span class="p">,</span> <span class="n">MPI_UNSIGNED</span><span class="p">,</span>
+                    <span class="n">subsetOfArray</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span> <span class="n">elementsPerProcess</span><span class="p">,</span> <span class="n">MPI_UNSIGNED</span><span class="p">,</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="n">MPI_COMM_WORLD</span><span class="p">);</span>
+
+        <span class="c1">// Loop is extraneous as we only have one element per process, but this is flexible</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">subsetOfArray</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"checking: "</span> <span class="o">&lt;&lt;</span> <span class="n">subsetOfArray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">" at proc: "</span> <span class="o">&lt;&lt;</span> <span class="n">rank</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="kt">int</span> <span class="n">isPrime</span> <span class="o">=</span> <span class="n">mp</span><span class="o">::</span><span class="n">IsPrime</span><span class="p">(</span><span class="n">subsetOfArray</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>  <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"result: "</span> <span class="o">&lt;&lt;</span> <span class="n">isPrime</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">mp</span><span class="o">::</span><span class="n">IsPrime</span><span class="p">(</span><span class="n">subsetOfArray</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="p">{</span>
+                <span class="n">found_prime</span> <span class="o">=</span> <span class="n">subsetOfArray</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+                <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"Found prime: "</span> <span class="o">&lt;&lt;</span> <span class="n">found_prime</span> <span class="o">&lt;&lt;</span> <span class="s">" at proc: "</span> <span class="o">&lt;&lt;</span> <span class="n">rank</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+                <span class="c1">// One we've found a prime, broadcast this news back to all other procs</span>
+                <span class="n">MPI_Bcast</span><span class="p">(</span><span class="o">&amp;</span><span class="n">found_prime</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MPI_UNSIGNED</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">MPI_COMM_WORLD</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Check if there has been any news regarding primes, if so put into global prime</span>
+        <span class="kt">int</span> <span class="n">global_prime</span><span class="p">;</span>
+        <span class="n">MPI_Allgather</span><span class="p">(</span>
+                <span class="o">&amp;</span><span class="n">found_prime</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">,</span>
+                <span class="n">MPI_UNSIGNED</span><span class="p">,</span>
+                <span class="o">&amp;</span><span class="n">global_prime</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">,</span>
+                <span class="n">MPI_UNSIGNED</span><span class="p">,</span>
+                <span class="n">MPI_COMM_WORLD</span>
+        <span class="p">);</span>
+
+        <span class="c1">// Break out of loop if we've found a prime globally</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">global_prime</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"global prime: "</span> <span class="o">&lt;&lt;</span> <span class="n">global_prime</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="n">found_prime</span> <span class="o">=</span> <span class="n">global_prime</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+   <span class="cm">/***********************Ignore this stuff***********************/</span>
+    <span class="n">MPI_Init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">argc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">argv</span><span class="p">);</span>
+	
+    <span class="kt">int</span> <span class="n">world_rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">;</span>
+    <span class="n">MPI_Comm_rank</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">world_rank</span><span class="p">);</span>
+    <span class="n">MPI_Comm_size</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">world_size</span><span class="p">)</span>
+    <span class="cm">/****************************************************************/</span>
+    <span class="n">computePrimesInParallel</span><span class="p">();</span>
+    <span class="cm">/***********************Ignore this stuff***********************/</span>
+    <span class="n">MPI_Finalize</span><span class="p">();</span>
+    <span class="cm">/****************************************************************/</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The only thing we have to keep in mind here is that the default behaviour of MPI is
+to return from all of your processes, even non-root processes, this is something you
+have to keep in mind (to test for rank) if you want to use the results of these computations
+further downstream - rather than just printing it out as I’ve done above.</p>
+
+<p>Though the worst part of MPI, the fact that you always fail silently, is still an issue
+despite these useful wrappers, and this has made me realise how much I rely on both the
+compiler and IDE to put me right when coding anything.</p>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<p>There wasn’t a great deal of syntax explanation up there, but to be honest with MPI
+you have to just get stuck in to get your head around the syntax. More importantly
+we’ve seen a few different ways of parallelising a simple problem using MPI, and how
+deadlock can be a serious issue. I think that these two implementations are fairly
+decent templates for large variety of problems though, so yeah copy and paste away.</p>
+:ET
