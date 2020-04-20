@@ -4,11 +4,16 @@ title: About
 ---
 # About
 
-I'm currently a Master's student at UCL, studying Scientific Computing,
-foolishly aiming to a Ph.D in the near future. Since finishing undergrad
-I've been working in various startups in and around London.
+I'm a graduate student at University College London. My research interests span
+scientific computing, and applied mathematics. Specifically I am working on
+high-performance distributed codes for integral equations, running on the latest
+heterogenous computing hardware. 
 
-I'm interested in all things mathematical, and computational. At the
-moment I am focused on improving my computer science and software
-engineering basics. You can follow my practice on 
-[GitHub](https://github.com/skailasa/practice/).
+Personally, I'm just generally interested in all aspects of computing.
+I find the idea of a general purpose machine fascinating, especially the complexity 
+that emerges from a single set of electronic components. Previously I studied physics,
+it wasn't quite for me. But, idea of being able to mathematically describe the world
+, often analytically, stuck with me. 
+
+This blog is mainly about my interest in computers and/or maths. I'm also interested
+in other things. Mainly, music, film/tv, cycling and keeping fit in general.
