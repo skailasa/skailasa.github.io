@@ -38,7 +38,7 @@ operator).
 $$
 \lambda x . x + 1
 $$
-
+s
 
 You can see the obvious resemblence. The variable 'x' is bound to the function
 in the sense that it's not making reference to an 'x' defined elsewhere in your
